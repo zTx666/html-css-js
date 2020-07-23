@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片懒加载</title>
+</head>
+<style>
+    .img-box {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+        justify-content: space-around;
+        width: 100%;
+        height: 100%;
+    }
+
+    .img-box img {
+        width: 200px;
+        height: 200px;
+        margin: 10px 0;
+        display: inline-block;
+    }
+
+    .fade-in {
+        animation: fadein 400ms ease-in 1;
+    }
+
+    .gujia {
+        animation: gujiaimg infinite 1000ms;
+    }
+
+    @keyframes gujiaimg {
+        0% {
+            background: linear-gradient(to right, rgba(200, 200, 200, .3), rgba(200, 200, 200, .5), #f1f1f1);
+        }
+
+        50% {
+            background: linear-gradient(to right, #f1f1f1, rgba(200, 200, 200, .3), rgba(200, 200, 200, .5));
+        }
+
+        100% {
+            background: linear-gradient(to right, rgba(200, 200, 200, .5), #f1f1f1, rgba(200, 200, 200, .3));
+        }
+    }
+
+    @keyframes fadein {
+        0% {
+            opacity: 0;
+        }
+
+        50% {
+            opacity: 0.5;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
+</style>
+
+<body>
+    <div class='img-box'>
+    </div>
+    <script>
+        let box = document.querySelector('.img-box');
+        creatImg(box) // 自动创建img （此行可删除）
+        function creatImg(boxDom) {
+            let app = boxDom;
+            let tmp = document.createDocumentFragment();
+            for (let i = 0; i < 120; i++) {
+                let ele = document.createElement('img');
+                ele.setAttribute('src', '');
+                ele.setAttribute('data-src', './1.jpg');
+                ele.classList.add('gujia');
+                tmp.appendChild(ele)
+            }
+            app.appendChild(tmp)
+        }
+    </script>
+    <script>
+        let Img = document.getElementsByTagName("img"),
+            len = Img.length,
+            count = 0;
+        function lazyLoad() {
+            let viewH = document.documentElement.clientHeight, //可见区域高度
+                scrollTop = document.documentElement.scrollTop; //滚动条距离顶部高度
+            for (let i = count; i < len; i++) {
+                if (Img[i].offsetTop < scrollTop + viewH) {
+                    if (Img[i].getAttribute('src') === '') {
+                        Img[i].classList.remove('gujia');
+                        Img[i].classList.add('fade-in');
+                        Img[i].src = Img[i].getAttribute('data-src')
+                        count++;
+                    }
+                }
+            }
+        }
+        function throttle(fn, delay) {
+            let flag = true,
+                timer = null;
+            return function (...args) {
+                let context = this;
+                if (!flag) return;
+                flag = false;
+                clearTimeout(timer)
+                timer = setTimeout(() => {
+                    fn.apply(context, args);
+                    flag = true;
+                }, delay);
+            };
+        };
+        window.addEventListener('scroll', throttle(lazyLoad, 600))
+        lazyLoad();
+    </script>
+</body>
+
+</html>
