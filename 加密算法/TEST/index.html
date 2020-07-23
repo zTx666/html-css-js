@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试加密算法</title>
+</head>
+
+<body>
+    加密值：<input type="text" value='mengmianxiaiii'><br>
+    <p>解密前：<h1></h1></p>
+    <p>解密后：<h1></h1></p>
+    <script src="../crypto-js-master/crypto-js.js"></script>
+    <script>
+        const CRYPTOJSKEY = "abcdefgabcdefg12";
+
+        function encrypt(plaintText) {
+            var plaintText = plaintText;
+            var options = {
+                mode: CryptoJS.mode.ECB,
+                padding: CryptoJS.pad.Pkcs7
+            };
+            var key = CryptoJS.enc.Utf8.parse(CRYPTOJSKEY);
+            var encryptedData = CryptoJS.AES.encrypt(plaintText, key, options);
+            var encryptedBase64Str = encryptedData.toString().replace(/\//g, "_");
+            encryptedBase64Str = encryptedBase64Str.replace(/\+/g, "-");
+            return encryptedBase64Str;
+        }
+
+        function decrypt(encryptedBase64Str) {
+            var vals = encryptedBase64Str.replace(/\-/g, '+').replace(/_/g, '/');
+            var options = {
+                mode: CryptoJS.mode.ECB,
+                padding: CryptoJS.pad.Pkcs7
+            };
+            var key = CryptoJS.enc.Utf8.parse(CRYPTOJSKEY);
+            var decryptedData = CryptoJS.AES.decrypt(vals, key, options);
+            var decryptedStr = CryptoJS.enc.Utf8.stringify(decryptedData);
+            return decryptedStr
+        }
+        document.getElementsByTagName('input')[0].addEventListener('input', function () {
+            let otest = document.getElementsByTagName('h1')[0];
+            let otest2 = document.getElementsByTagName('h1')[1];
+            otest2.innerText = otest.innerText = '';
+            otest.innerText += encrypt(this.value);
+            otest2.innerText += (decrypt(encrypt(this.value)));
+        })
+    </script>
+</body>
+
+</html>
